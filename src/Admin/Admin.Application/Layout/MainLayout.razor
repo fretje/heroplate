@@ -1,0 +1,79 @@
+﻿@using Heroplate.Admin.Application.Update
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+
+@inherits FluxorComponent
+
+@inject IState<LayoutState> LayoutState
+@inject IDispatcher Dispatcher
+@inject IWebAssemblyHostEnvironment Environment
+@inject IStringLocalizer<MainLayout> L
+
+<MudAppBar Elevation="0">
+    <MudTooltip Text="Toggle Drawer">
+        <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
+            OnClick="() => Dispatcher.Dispatch(new ToggleDrawerStateAction())" />
+    </MudTooltip>
+
+    <div class="d-flex align-baseline">
+        <MudButton Variant="Variant.Text" DisableElevation Href="/">
+            @if (!LayoutState.Value.IsDrawerOpen)
+            {
+                <img src="img/logo.png" class="heroplate-logo align-self-center pr-1" />
+            }
+            <p class="align-self-center">Heroplate</p>
+        </MudButton>
+        @if (!Environment.IsDevelopment())
+        {
+            <UpdateAvailableButton Class="align-self-center ml-5" />
+        }
+    </div>
+
+    <MudSpacer />
+
+    <DarkModeButton />
+
+    <NotificationConnectionStatus />
+
+    <MudMenu AnchorOrigin="Origin.BottomRight" LockScroll TransformOrigin="Origin.TopRight">
+        <ActivatorContent>
+            <MudIconButton Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" />
+        </ActivatorContent>
+        <ChildContent>
+            <div class="py-2" style="min-width: 220px">
+                <PersonCard Class="mt-n2" Style="margin-bottom:0px!important" />
+                <MudMenuItem OnClick="@(() => Navigation.NavigateTo("/account"))">
+                    <div class="d-flex">
+                        <MudIcon Class="mx-4" Icon="fas fa-regular fa-user-gear" Size="Size.Small" />
+                        <MudText>@L["Account"]</MudText>
+                    </div>
+                </MudMenuItem>
+                <div class="mt-4 mx-4">
+                    <MudButton Color="Color.Error" FullWidth StartIcon="@Icons.Material.Filled.Logout"
+                        Variant="Variant.Filled" OnClick="DialogService.ConfirmAndLogout">
+                        Logout
+                    </MudButton>
+                </div>
+            </div>
+        </ChildContent>
+    </MudMenu>
+</MudAppBar>
+
+<MudDrawer Elevation="25" ClipMode="DrawerClipMode.Never"
+    Open="LayoutState.Value.IsDrawerOpen"
+    OpenChanged="isOpen => Dispatcher.Dispatch(new ChangeDrawerStateAction(isOpen))">
+    <NavMenu />
+</MudDrawer>
+
+<MudMainContent>
+    <MudContainer MaxWidth="MaxWidth.False" Class="mt-2">
+        @ChildContent
+        <MudScrollToTop TopOffset="400" Style="z-index:2000;">
+            <MudFab Icon="@Icons.Material.Filled.KeyboardArrowUp" Color="Color.Primary" />
+        </MudScrollToTop>
+    </MudContainer>
+</MudMainContent>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+}

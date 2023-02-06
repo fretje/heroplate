@@ -1,0 +1,41 @@
+name: Build and Test full solution
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    - '.github/workflows/build.yml'
+    - 'Directory.Build.*'
+    - 'src/**'
+    - 'tests/**'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DOTNET_NOLOGO: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 0
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      NUGET_CERT_REVOCATION_MODE: "offline"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 7.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore Heroplate.sln
+
+    - name: Build
+      run: dotnet build Heroplate.sln --no-restore
+
+    - name: Test
+      run: dotnet test Heroplate.sln --no-build --verbosity normal

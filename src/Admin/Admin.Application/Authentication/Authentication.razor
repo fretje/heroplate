@@ -1,0 +1,98 @@
+﻿@page "/authentication/{action}"
+@attribute [AllowAnonymous]
+
+@inject IStringLocalizer<Authentication> L
+
+<RemoteAuthenticatorView Action="@Action">
+    @* Override the different child items to adapt them to our own style
+        I've done this for LogOutSucceeded now, already added the rest but with the defaults (and localization). *@
+    <LogOutSucceeded>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["You were successfully logged out."]
+            </MudText>
+        </MudItem>
+        <MudItem Class="d-flex justify-center">
+            <MudButton Href="/" Color="Color.Primary" Size="Size.Large">
+                @L["Click here to log back in"]
+            </MudButton>
+        </MudItem>
+    </LogOutSucceeded>
+    <LoggingIn>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["Logging you in..."]
+            </MudText>
+        </MudItem>
+    </LoggingIn>
+    <CompletingLoggingIn>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["Checking permissions..."]
+            </MudText>
+        </MudItem>
+    </CompletingLoggingIn>
+    <LogInFailed>
+        <AuthorizeView Context="loginFailed">
+            <Authorized>
+                <RedirectToHome />
+            </Authorized>
+            <NotAuthorized>
+                <MudItem Class="d-flex justify-center">
+                    <MudText Typo="Typo.h5" GutterBottom>
+                        @L["Sorry, your login failed. Please try again or contact support."]
+                    </MudText>
+                </MudItem>
+                @if (GetMessage() is string message && !string.IsNullOrWhiteSpace(message))
+                {
+                    <MudItem Class="d-flex justify-center">
+                        @message
+                    </MudItem>
+                }
+            </NotAuthorized>
+        </AuthorizeView>
+        <MudItem Class="d-flex justify-center">
+            <MudButton Href="/" Color="Color.Primary" Size="Size.Large">
+                @L["Click here to log back in"]
+            </MudButton>
+        </MudItem>
+    </LogInFailed>
+    <LogOut>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["Logging you out..."]
+            </MudText>
+        </MudItem>
+    </LogOut>
+    <CompletingLogOut>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["Logging you out..."]
+            </MudText>
+        </MudItem>
+    </CompletingLogOut>
+    <LogOutFailed>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom>
+                @L["Sorry, log out operation failed. Please try again or contact support."]
+            </MudText>
+        </MudItem>
+    </LogOutFailed>
+</RemoteAuthenticatorView>
+
+@code {
+    [Parameter] public string? Action { get; set; }
+
+    private string? GetMessage()
+    {
+        var query = Navigation.ToAbsoluteUri(Navigation.Uri).Query;
+
+        if (!string.IsNullOrWhiteSpace(query)
+            && QueryHelpers.ParseQuery(query).TryGetValue("message", out var message))
+        {
+            return message.ToString();
+        }
+
+        return null;
+    }
+}

@@ -1,0 +1,30 @@
+﻿@inherits FluxorComponent
+
+@inject IState<LayoutState> LayoutState
+@inject IDispatcher Dispatcher
+@inject IStringLocalizer<LanguageSelector> L
+
+<MudTooltip Text="@LayoutState.Value.LanguageCode">
+    <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY Dense>
+        @foreach (var language in LocalizationConstants.SupportedLanguages)
+        {
+            if (language.Code == LayoutState.Value.LanguageCode)
+            {
+                <MudMenuItem style="background:var(--mud-palette-primary); color:white">@L[language.DisplayName]</MudMenuItem>
+            }
+            else
+            {
+                <MudMenuItem OnClick="() => Dispatcher.Dispatch(new ChangeLanguageAction(language.Code))">@L[language.DisplayName]</MudMenuItem>
+            }
+        }
+    </MudMenu>
+</MudTooltip>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<ChangeLanguageAction>(_ =>
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true));
+    }
+}

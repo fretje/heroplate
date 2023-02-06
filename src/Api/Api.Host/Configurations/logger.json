@@ -1,0 +1,59 @@
+{
+  "LoggerSettings": {
+    "EnableRequestLogging": true
+  },
+  "Serilog": {
+    "Using": [],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithProcessId",
+      "WithThreadId",
+      "WithHangfireContext"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Hangfire": "Warning",
+        "Microsoft": "Error",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "System": "Information",
+        "System.Net": "Warning"
+      }
+    },
+    "Properties": {
+      "Application": "Heroplate.Api"
+    },
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs/logs.json",
+          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+          "rollingInterval": "Day",
+          "restrictedToMinimumLevel": "Information",
+          "retainedFileCountLimit": 5
+        }
+      }
+      //{
+      //  "Name": "Seq",
+      //  "Args": {
+      //    "serverUrl": "http://localhost:5341"
+      //  }
+      //},
+      //{
+      //  "Name": "Hangfire"
+      //},
+      //{
+      //  "Name": "Elasticsearch",
+      //  "Args": {
+      //    "nodeUris": "http://localhost:9200;",
+      //    "indexFormat": "Heroplate.Api-logs-{0:yyyy.MM}",
+      //    "numberOfShards": 2,
+      //    "numberOfReplicas": 1,
+      //    "restrictedToMinimumLevel": "Information"
+      //  }
+      //}
+    ]
+  }
+}

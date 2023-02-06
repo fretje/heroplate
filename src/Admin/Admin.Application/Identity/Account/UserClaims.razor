@@ -1,0 +1,43 @@
+﻿@inject IStringLocalizer<Profile> L
+@inject IAuthenticationService Authenticator
+
+<MudGrid>
+    <MudItem xs="20" sm="12" md="16">
+        <MudCard Elevation="20">
+            <MudCardContent>
+                  <MudList >
+                    @if (Claims is not null)
+                    {
+                        @foreach (var claim in Claims)
+                        {
+                            <MudListItem>
+                                <div class="d-flex align-self-center">
+                                    <MudChip>
+                                        @claim.Type
+                                    </MudChip>
+                                    <MudText Class="align-self-center">
+                                        @claim.Value
+                                    </MudText>
+                                </div>
+                            </MudListItem>
+                            <MudDivider />
+                        }
+                    }
+                </MudList>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code{
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    public IEnumerable<Claim>? Claims { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+        Claims = authState.User.Claims;
+    }
+}

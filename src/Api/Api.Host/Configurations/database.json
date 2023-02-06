@@ -1,0 +1,6 @@
+{
+  "DatabaseSettings": {
+    "DBProvider": "mssql",
+    "ConnectionString": "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=herodb;Integrated Security=True;Trust Server Certificate=True;MultipleActiveResultSets=True"
+  }
+}

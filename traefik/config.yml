@@ -1,0 +1,15 @@
+http:
+  routers:
+    traefik:
+      rule: "Host(`traefik.heroplate.local`)"
+      service: "api@internal"
+      tls:
+        domains:
+          - main: "heroplate.local"
+            sans:
+              - "*.heroplate.local"
+
+tls:
+  certificates:
+    - certFile: "/etc/certs/heroplate.local.crt"
+      keyFile: "/etc/certs/heroplate.local.key"

@@ -1,0 +1,21 @@
+{
+  "name": "Heroplate",
+  "short_name": "Heroplate",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F26963",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "img/logo-large.png",
+      "type": "image/png",
+      "sizes": "568x568"
+    },
+    {
+      "src": "img/logo-medium.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}

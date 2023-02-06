@@ -1,0 +1,77 @@
+﻿@implements IDisposable
+
+@inject IJSRuntime _jsRuntime
+
+@if (_updateAvailable)
+{
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="@Class" OnClick="InstallAsync" Disabled="_installing">
+        @if (_installing)
+        {
+            <text>Installing</text>
+            <MudProgressCircular Class="ml-3" Size="Size.Small" Indeterminate />
+        }
+        else
+        {
+            <text>New version available - Click to install</text>
+        }
+    </MudButton>
+}
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+    [CascadingParameter]
+    private NotificationConnection _notifications { get; set; } = default!;
+
+    private bool _updateAvailable;
+    private bool _installing;
+
+    private DotNetObjectReference<UpdateAvailableButton>? _objectReference;
+
+    // this component works together with the javascript code in service-worker-registration.js
+
+    protected override async Task OnInitializedAsync()
+    {
+        _objectReference = DotNetObjectReference.Create(this);
+        await _jsRuntime.InvokeAsync<object>("subscribeToUpdateAvailable", _objectReference, nameof(OnUpdateAvailable));
+        await _jsRuntime.InvokeAsync<object>("subscribeToInstallUpdate", _objectReference, nameof(OnInstallUpdate));
+    }
+
+    [JSInvokable(nameof(OnUpdateAvailable))]
+    public Task OnUpdateAvailable()
+    {
+        _updateAvailable = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    // clicking the button sends a message to all open tabs (through the service worker) to start the update process
+    private async Task InstallAsync()
+    {
+        if (!await _jsRuntime.InvokeAsync<bool>("installUpdateOnAllClients"))
+        {
+            // when installUpdateOnAllClients fails, we start the installation process here in stead...
+            await OnInstallUpdate();
+        }
+    }
+
+    // this will be called as a response to the message sent to all tabs for this particular tab
+    [JSInvokable(nameof(OnInstallUpdate))]
+    public async Task OnInstallUpdate()
+    {
+        _installing = true;
+        StateHasChanged();
+
+        // calling installUpdate will activate the new service worker, which will automatically trigger a reload of the page
+        await _jsRuntime.InvokeVoidAsync("installUpdate");
+
+        // We have to stop the signalr connection otherwise the service worker won't update
+        await _notifications.DisposeAsync();
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _objectReference?.Dispose();
+    }
+}

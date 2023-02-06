@@ -1,0 +1,132 @@
+@page "/audit-logs"
+
+@inject IStringLocalizer<AuditLogs> L
+@inject IPersonalClient PersonalClient
+
+<HeroTitle Title="@L["Audit Logs"]" Description="@L["Your Recent Activities."]" />
+
+<EntityTable TEntity="RelatedAuditTrail" TId="Guid" TRequest="object" Context="@Context" @bind-SearchString="_searchString">
+
+    <AdvancedSearchContent>
+        <MudSwitch @bind-Checked="@_searchInOldValues" Color="Color.Primary" Style="margin-left: 5px;">@L["Search in Old Values"]</MudSwitch>
+        <MudSwitch @bind-Checked="@_searchInNewValues" Color="Color.Primary" Style="margin-left: 5px;">@L["Search in New Values"]</MudSwitch>
+        <MudDateRangePicker @ref="_dateRangePicker" PickerVariant="PickerVariant.Dialog" Label="@L["Date Range For Searching"]" @bind-DateRange="_dateRange">
+            <PickerActions>
+                <MudButton Class="mr-auto align-self-start" OnClick="() => _dateRangePicker?.Clear()">@L["Clear"]</MudButton>
+                <MudButton OnClick="() => _dateRangePicker?.Close(false)">@L["Cancel"]</MudButton>
+                <MudButton Color="Color.Primary" OnClick="() => _dateRangePicker?.Close()">@L["Ok"]</MudButton>
+            </PickerActions>
+        </MudDateRangePicker>
+    </AdvancedSearchContent>
+
+    <ActionsContent>
+        <MudButton Variant="Variant.Filled" DisableElevation EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary"
+            OnClick="() => ShowBtnPress(context.Id)">@((context.ShowDetails == true) ? L["Hide"] : L["Show"]) @L["Trail Details"]</MudButton>
+    </ActionsContent>
+
+    <ChildRowContent>
+        @if (context.ShowDetails)
+        {
+            <MudTr>
+                <td colspan="5">
+                    <MudCard Elevation="25" style="margin: 10px !important;">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudAlert Severity="Severity.Info" Typo="Typo.body1">@L["Details for Trail ID"] : <strong>@context.Id</strong></MudAlert>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <table class="mud-table-root">
+                                <tbody class="mud-table-body">
+                                    @if (!string.IsNullOrEmpty(context.AffectedColumns))
+                                    {
+                                        <tr class="mud-table-row" style="padding:10px!important">
+                                            <td>@L["Columns Affected"]</td>
+                                            <td>
+                                                <MudItem>
+                                                    @foreach (var column in context.AffectedColumns.Trim('[').Trim(']').Split(','))
+                                                    {
+                                                        <MudChip Label Color="Color.Surface">@column.Replace('"', ' ').Trim()</MudChip>
+                                                    }
+                                                </MudItem>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr class="mud-table-row">
+                                        <td>@L["Primary Key"]</td>
+                                        <td>
+                                            <MudItem>
+                                                <MudChip Label Color="Color.Surface">@context.PrimaryKey?.Trim('{').Trim('}').Replace('"', ' ').Trim()</MudChip>
+                                            </MudItem>
+                                        </td>
+                                    </tr>
+                                    @if (!string.IsNullOrEmpty(context.OldValues))
+                                    {
+                                        <tr class="mud-table-row">
+                                            <td>@L["Old Values"]</td>
+                                            <td>
+
+                                                <MudItem>
+                                                    @foreach (var value in context.OldValues.Trim('{').Trim('}').Split(','))
+                                                    {
+                                                        @if (_searchInOldValues)
+                                                        {
+                                                            <MudChip Label Color="Color.Warning">
+                                                                <MudHighlighter Text="@value.Replace('"', ' ').Trim()" HighlightedText="@_searchString" />
+                                                            </MudChip>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudChip Label Color="Color.Warning">@value.Replace('"', ' ').Trim()</MudChip>
+                                                        }
+                                                    }
+                                                </MudItem>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (!string.IsNullOrEmpty(context.NewValues))
+                                    {
+                                        <tr class="mud-table-row">
+                                            <td>@L["New Values"]</td>
+                                            <td>
+
+                                                <MudItem>
+                                                    @foreach (var value in context.NewValues.Trim('{').Trim('}').Split(','))
+                                                    {
+                                                        @if (_searchInNewValues)
+                                                        {
+                                                            <MudChip Label Color="Color.Success">
+                                                                <MudHighlighter Text="@value.Replace('"', ' ').Trim()" HighlightedText="@_searchString" />
+                                                            </MudChip>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudChip Label Color="Color.Success">@value.Replace('"', ' ').Trim()</MudChip>
+                                                        }
+                                                    }
+                                                </MudItem>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+
+</EntityTable>
+
+@code {
+    private RenderFragment<RelatedAuditTrail> DateFieldTemplate => trail => __builder =>
+    {
+        <MudItem>
+            <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label Color="Color.Surface">@L["Local"] : @trail.LocalTime.ToString("G")</MudChip>
+        </MudItem>
+        <MudItem>
+            <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label Color="Color.Surface">@L["UTC"] : @trail.DateTime.ToString("G")</MudChip>
+        </MudItem>
+    };
+}

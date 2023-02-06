@@ -1,0 +1,58 @@
+﻿@page "/appsettings"
+
+@attribute [PermissionsAuthorize(Permissions.AppSettings.View)]
+
+@inject IStringLocalizer<AppSettings> L
+@inject IAppSettingsClient AppSettingsClient
+
+<HeroTitle Title="@L["Application Settings"]" Description="@L["Manage Application Settings"]" />
+
+<HeroTable Items="AppSettingsList" Filter="Search"
+    ReadOnly="!_canUpdate" CanCancelEdit
+    RowEditPreview="BackupAppSetting" RowEditCancel="ResetAppSettingToOriginalValue" RowEditCommit="AppSettingHasBeenCommitted"
+    Dense Hover Striped Loading="AppSettingsList is null">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Immediate Placeholder="@L["Search For Settings"]"
+            Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3" />
+    </ToolBarContent>
+    <ColGroup>
+        <col style="width:80px;" />
+        <col style="width:80px;" />
+        <col />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="(AppSettingDto x) => x.Category">@L["Category"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="(AppSettingDto x) => x.Name">@L["Name"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="(AppSettingDto x) => x.Value">@L["Value"]</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@L["Category"]">
+            <MudHighlighter Text="@context.Category" HighlightedText="@_searchString" />
+        </MudTd>
+        <MudTd DataLabel="@L["Name"]">
+            <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+        </MudTd>
+        <MudTd DataLabel="@L["Value"]">
+            <MudHighlighter Text="@context.Value" HighlightedText="@_searchString" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="@L["Category"]">
+            <div style="margin-top: 6px">
+                <MudHighlighter Text="@context.Category" HighlightedText="@_searchString" />
+            </div>
+        </MudTd>
+        <MudTd DataLabel="@L["Name"]">
+            <div style="margin-top: 6px">
+                <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+            </div>
+        </MudTd>
+        <MudTd DataLabel="@L["Value"]">
+            <MudTextField @bind-Value="@context.Value" Style="margin-top: 0" />
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <TablePager OnClickReload="LoadDataAsync" />
+    </PagerContent>
+</HeroTable>

@@ -1,0 +1,16 @@
+﻿<MudTooltip Text="@Tooltip" Placement="Placement.Top" Arrow>
+    <MudIconButton Icon="@Icon" OnClick="OnClick" Color="Color" Size="Size.Small" Disabled="Disabled" />
+</MudTooltip>
+
+@code {
+    [Parameter]
+    public string Tooltip { get; set; } = default!;
+    [Parameter]
+    public string Icon { get; set; } = default!;
+    [Parameter]
+    public Color Color  { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
+}

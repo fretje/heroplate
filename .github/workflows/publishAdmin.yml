@@ -1,0 +1,31 @@
+name: Build Admin and push to docker
+
+on:
+  #push:
+  #  branches: [ main ]
+  #  paths:
+  #  - '.github/workflows/publishAdmin.yml'
+  #  - 'Directory.Build.*'
+  #  - 'src/Admin/**'
+  #  - 'src/Api/Api.Contracts/**'
+  #  - 'src/Shared/Shared.Authorization/**'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mr-smithers-excellent/docker-build-push@v5.8
+      name: Build & push Docker image
+      with:
+        image: heroplate-admin
+        tags: v1, latest
+        registry: ghcr.io
+        dockerfile: src/Admin/Admin.Host/Dockerfile
+        username: ${{ github.actor }}
+        password: ${{ github.token }}

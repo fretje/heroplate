@@ -1,0 +1,107 @@
+﻿@page "/tenants"
+
+@attribute [PermissionsAuthorize(Permissions.Tenants.View)]
+
+@inject IStringLocalizer<Tenants> L
+@inject IAuthenticationService Authenticator
+@inject ITenantsClient TenantsClient
+
+<HeroTitle Title="@L["Tenants"]" Description="@L["Manage Tenants."]" />
+
+<EntityTable @ref="EntityTable" TEntity="TenantDetail" TId="Guid" TRequest="CreateTenantRequest" Context="@Context"
+    @bind-SearchString="_searchString">
+    <EntityFields>
+        <MudItem xs="12" md="6">
+            <MudTextField T="string" For="() => context.Id" @bind-Value="context.Id" Label="@L["Key"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField T="string" For="() => context.Name" @bind-Value="context.Name" Label="@L["Name"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField T="string" For="() => context.ConnectionString" HelperText="@L["To use default connection string, leave this field blank."]" @bind-Value="context.ConnectionString"
+                Label="@L["Connection String"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField T="string" For="() => context.AdminEmail" @bind-Value="context.AdminEmail"
+                Label="@L["Admin Email"]" />
+        </MudItem>
+        @if (Authenticator.ProviderType == AuthProvider.AzureAd)
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" For="() => context.Issuer" @bind-Value="context.Issuer" Label="@L["Issuer"]" />
+            </MudItem>
+        }
+    </EntityFields>
+    <ExtraActions>
+        <PermissionsAuthorizeView Permission="@Permissions.Tenants.Update" Context="tenantUpdate">
+            <HeroTooltipButton Tooltip="@L["Upgrade Subscription"]" Icon="@Icons.Material.Filled.Upgrade" OnClick="() => ViewUpgradeSubscriptionModalAsync(context.Id)" />
+            @if (!context.IsActive)
+            {
+                <HeroTooltipButton Tooltip="@L["Activate Tenant"]" Icon="@Icons.Material.Filled.ThumbUp" Color="Color.Success" OnClick="() => ActivateTenantAsync(context.Id)" />
+            }
+            else
+            {
+                <HeroTooltipButton Tooltip="@L["Deactivate Tenant"]" Icon="@Icons.Material.Filled.DoNotTouch" Color="Color.Error" OnClick="() => DeactivateTenantAsync(context.Id)" />
+            }
+        </PermissionsAuthorizeView>
+       <HeroTooltipButton Tooltip="@($"{(context.ShowDetails ? L["Hide"] : L["Show"])} {L["Tenant Details"]}")" Icon="@Icons.Material.Filled.MoreHoriz" OnClick="() => ViewTenantDetails(context.Id)" />
+    </ExtraActions>
+
+    <ChildRowContent>
+        @if (context.ShowDetails)
+        {
+            <MudTr>
+                <td colspan="6">
+                    <MudCard Elevation="25" style="margin: 10px !important;">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudAlert Severity="Severity.Info" Typo="Typo.body1">@L["Details for Tenant"] :
+                                    <strong>@context.Id</strong>
+                                </MudAlert>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <table class="mud-table-root">
+                                <colgroup>
+                                    <col style="width: 150px" />
+                                    <col />
+                                </colgroup>
+                                <tbody class="mud-table-body">
+                                    <tr class="mud-table-row">
+                                        <td>@L["ConnectionString"]</td>
+                                        <td>
+                                            <MudItem>
+                                                @if(string.IsNullOrEmpty(context.ConnectionString?.Trim()))
+                                                {
+                                                    <MudChip Label Color="Color.Secondary">@L["Shared Database"]</MudChip>
+                                                }
+                                                else
+                                                {
+                                                    <MudChip Label Color="Color.Primary">@context.ConnectionString?.Trim()</MudChip>
+                                                }
+                                            </MudItem>
+                                        </td>
+                                    </tr>
+                                    @if (Authenticator.ProviderType == AuthProvider.AzureAd)
+                                    {
+                                        <tr class="mud-table-row">
+                                            <td>@L["Issuer"]</td>
+                                            <td>
+                                                <MudItem>
+                                                    <MudChip Label Color="Color.Primary">
+                                                        @context.Issuer?.Trim()
+                                                    </MudChip>
+                                                </MudItem>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+
+</EntityTable>

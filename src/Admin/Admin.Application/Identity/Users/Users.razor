@@ -1,0 +1,50 @@
+﻿@page "/users"
+
+@attribute [PermissionsAuthorize(Permissions.Users.View)]
+
+@inject IStringLocalizer<Users> L
+@inject IUsersClient UsersClient
+
+<HeroTitle Title="@L["Users"]" Description="@L["Manage Users"]" />
+
+<EntityTable TEntity="UserDetailsDto" TId="Guid" TRequest="object" Context="@Context">
+    <ExtraActions>
+        <HeroTooltipButton Tooltip="@L["View Profile"]" Icon="@Icons.Material.Filled.Person" OnClick="() => ViewProfile(context.Id)" />
+        <PermissionsAuthorizeView Permission="@Permissions.UserRoles.View" Context="userRoles">
+            <HeroTooltipButton Tooltip="@L["Manage Roles"]" Icon="@Icons.Material.Filled.Dehaze" OnClick="() => ManageRoles(context.Id)" />
+        </PermissionsAuthorizeView>
+    </ExtraActions>
+</EntityTable>
+
+@code {
+    protected EntityClientTableContext<UserDetailsDto, Guid, object> Context { get; set; } = default!;
+
+    protected override void OnInitialized() =>
+        Context = new(
+            entityTypeName: L["User"],
+            entityTypeNamePlural: L["Users"],
+            fields: new()
+            {
+                new(user => user.FirstName, L["First Name"]),
+                new(user => user.LastName, L["Last Name"]),
+                new(user => user.UserName, L["UserName"]),
+                new(user => user.Email, L["Email"]),
+                new(user => user.PhoneNumber, L["PhoneNumber"]),
+                new(user => user.EmailConfirmed, L["Email Confirmation"], Type: typeof(bool)),
+                new(user => user.IsActive, L["Active"], Type: typeof(bool))
+            },
+            idFunc: user => user.Id,
+            loadDataFunc: async () => (await UsersClient.GetListAsync()).ToList(),
+            searchFunc: (searchString, user) =>
+                string.IsNullOrWhiteSpace(searchString)
+                    || user.FirstName?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
+                    || user.LastName?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
+                    || user.Email?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
+                    || user.PhoneNumber?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
+                    || user.UserName?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true,
+            hasExtraActionsFunc: () => true);
+
+    private void ViewProfile(Guid userId) => Navigation.NavigateTo($"/users/{userId}/profile");
+
+    private void ManageRoles(Guid userId) => Navigation.NavigateTo($"/users/{userId}/roles");
+}

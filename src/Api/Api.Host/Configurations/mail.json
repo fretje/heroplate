@@ -1,0 +1,10 @@
+{
+  "MailSettings": {
+    "DisplayName": "admin",
+    "From": "admin@heroplate",
+    "Host": "smtp.ethereal.email",
+    "Port": 587,
+    "Password": "your_ethereal_password",
+    "UserName": "your_ethereal_username"
+  }
+}

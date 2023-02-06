@@ -1,0 +1,70 @@
+﻿@page "/products"
+
+@attribute [PermissionsAuthorize(Permissions.Products.View)]
+
+@inject IStringLocalizer<Products> L
+@inject IProductsClient ProductsClient
+@inject IBrandsClient BrandsClient
+
+@if (BrandId is null)
+{
+    <HeroTitle Title="@L["Products"]" Description="@L["Manage Products."]" />
+}
+
+<EntityTable TEntity="ProductDto" TId="int" TRequest="UpdateProductRequest" Context="@Context">
+
+    <EntityFields>
+        <MudItem xs="12" md="12">
+            <BrandAutocomplete For="() => context.BrandId" @bind-Value="context.BrandId" />
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudTextField Label="@L["Name"]" For="() => context.Name" @bind-Value="context.Name" />
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudTextField Label="@L["Description"]" For="() => context.Description" @bind-Value="context.Description" Lines="3" />
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudTextField Label="@L["Rate"]" For="() => context.Rate" @bind-Value="context.Rate" />
+        </MudItem>
+    </EntityFields>
+
+</EntityTable>
+
+@code {
+    [Parameter]
+    public int? BrandId { get; set; }
+
+    protected EntityServerTableContext<ProductDto, int, UpdateProductRequest> Context { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        var fields = new List<EntityField<ProductDto>>();
+        if (BrandId is null)
+        {
+            fields.Add(new(product => product.BrandName, L["Brand"], "Brand.Name"));
+        }
+        fields.Add(new(product => product.Name, L["Name"], "Name"));
+        fields.Add(new(product => product.Description, L["Description"], "Description"));
+        fields.Add(new(product => product.Rate, L["Rate"], "Rate"));
+        Context = new(
+            entityTypeName: L["Product"],
+            entityTypeNamePlural: L["Products"],
+            createPermission: Permissions.Products.Create,
+            updatePermission: Permissions.Products.Update,
+            deletePermission: Permissions.Products.Delete,
+            fields: fields,
+            idFunc: product => product.Id,
+            searchFunc: async filter =>
+                {
+                    var searchFilter = filter.Adapt<SearchProductsRequest>();
+                    searchFilter.BrandId = BrandId;
+                    searchFilter.AdvancedSearch = new Search { Fields = new[] { "Id", "Name", "Description", "Brand.Name" }, Keyword = filter.Keyword };
+                    searchFilter.Keyword = null;
+                    return (await ProductsClient.SearchAsync(searchFilter)).Adapt<PaginationResponse<ProductDto>>();
+                },
+            getDefaultsFunc: () => Task.FromResult(new UpdateProductRequest { BrandId = BrandId ?? 0 }),
+            createFunc: product => ProductsClient.CreateAsync(product.Adapt<CreateProductRequest>()),
+            updateFunc: ProductsClient.UpdateAsync,
+            deleteFunc: ProductsClient.DeleteAsync);
+    }
+}

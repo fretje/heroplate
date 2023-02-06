@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.2" />
+        <PackageReference Include="Respawn" Version="6.0.0" />
+        <PackageReference Include="Testcontainers" Version="2.3.0" />
+        <PackageReference Include="WebMotions.Fake.Authentication.JwtBearer" Version="7.0.0" />
+        <PackageReference Include="xunit.assert" Version="2.4.2" />
+        <PackageReference Include="xunit.extensibility.core" Version="2.4.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Api\Api.Application\Api.Application.csproj" />
+        <ProjectReference Include="..\..\..\src\Shared\Shared.Authorization\Shared.Authorization.csproj" />
+    </ItemGroup>
+
+</Project>

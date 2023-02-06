@@ -1,0 +1,69 @@
+name: Build Api and push to docker
+
+on:
+  #push:
+  #  branches: [ main ]
+  #  paths:
+  #  - '.github/workflows/publishApi.yml'
+  #  - 'Directory.Build.*'
+  #  - 'src/Api/**'
+  #  - 'src/Shared/**'
+  #  - 'tests/Api/**'
+  #  - 'tests/Shared/**'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DOTNET_NOLOGO: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 0
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      NUGET_CERT_REVOCATION_MODE: "offline"
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 7.0.x
+    
+    - name: Restore dependencies
+      run: |
+        dotnet restore tests/Api/Api.Host.Tests/ --locked-mode &&
+        dotnet restore tests/Api/Api.Infrastructure.Tests/ --locked-mode &&
+        dotnet restore tests/Shared/Shared.Authorization.Tests/ --locked-mode
+
+    - name: Build
+      run: |
+        dotnet build tests/Api/Api.Host.Tests/ --no-restore &&
+        dotnet build tests/Api/Api.Infrastructure.Tests/ --no-restore &&
+        dotnet build tests/Shared/Shared.Authorization.Tests/ --no-restore
+
+    - name: Test
+      run: |
+        dotnet test tests/Api/Api.Host.Tests/ --no-build -e CI=TRUE &&
+        dotnet test tests/Api/Api.Infrastructure.Tests/ --no-build &&
+        dotnet test tests/Shared/Shared.Authorization.Tests/ --no-build
+
+    - name: Add build number to version
+      shell: pwsh
+      run: |
+        $xml = [Xml](Get-Content ./Directory.Build.props)
+        $xml.Project.PropertyGroup.Version += ".${{ github.run_number }}"
+        $xml.Save("$pwd/Directory.Build.props")
+
+    - name: Build & push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5.8
+      with:
+        image: heroplate-api
+        tags: v1, latest
+        registry: ghcr.io
+        dockerfile: src/Api/Api.Host/Dockerfile
+        username: ${{ github.actor }}
+        password: ${{ github.token }}

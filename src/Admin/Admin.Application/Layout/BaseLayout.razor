@@ -1,0 +1,31 @@
+﻿@using Heroplate.Admin.Infrastructure.Theme
+@using Fluxor.Persist.Middleware;
+
+@inherits FluxorLayout
+
+@inject IState<LayoutState> LayoutState
+
+<MudThemeProvider IsDarkMode="LayoutState.Value.IsDarkMode" Theme="new CustomTheme()" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<AuthorizeView>
+    <NotAuthorized>
+        <MudAppBar Elevation="0" Style="background:#6e6e6e00!important" />
+        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center" Style="height: 100vh;">
+            <MudPaper Elevation="25" Class="pa-8"> 
+                @Body
+            </MudPaper>
+        </MudContainer>
+    </NotAuthorized>
+
+    <Authorized>
+        <NotificationConnection>
+            <MudLayout>
+                <MainLayout>
+                    @Body
+                </MainLayout>
+            </MudLayout>
+        </NotificationConnection> 
+    </Authorized>
+</AuthorizeView>

@@ -1,0 +1,15 @@
+﻿@inject IStringLocalizer<TablePager> L
+
+<div class="mud-table-pagination-toolbar d-flex align-center">
+    <MudSpacer />
+
+    <MudTablePager Style="border-top: none" PageSizeOptions="new [] { 5, 10, 25, 50, 100 }" />
+
+    <HeroTooltipButton Tooltip="@L["Reload"]" Icon="@Icons.Material.Filled.Refresh" OnClick="OnClickReload" />
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<MouseEventArgs> OnClickReload { get; set; }
+}

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>Heroplate.Shared.Authorization</RootNamespace>
+        <AssemblyName>Heroplate.Shared.Authorization</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.2" />
+    </ItemGroup>
+
+</Project>

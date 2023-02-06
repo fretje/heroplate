@@ -1,0 +1,5 @@
+{
+  "SecuritySettings": {
+    "Provider": "FakeJwt"
+  }
+}

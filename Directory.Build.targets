@@ -1,0 +1,22 @@
+<Project>
+    
+    <PropertyGroup>
+        <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Remove="**/packages.lock.json" />
+        <None Include="**/packages.lock.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
+    <!-- This adds the git commit sha to the Product Version (only on release) where it can be fetched with FileVersionInfo.GetVersionInfo -->
+    <Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation" Condition="'$(Configuration)' == 'Release'">
+        <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="True" IgnoreExitCode="False">
+            <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
+        </Exec>
+    </Target>
+    
+</Project>

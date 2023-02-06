@@ -1,0 +1,49 @@
+@inject ICourier Courier
+
+<MudTooltip Text="@TooltipText">
+    <MudIconButton Icon="@Icon" Color="@IconColor" />
+</MudTooltip>
+
+@code {
+    public string TooltipText { get; set; } = "No Connection";
+    public string Icon { get; set; } = Icons.Material.Filled.SignalWifi0Bar;
+    public Color IconColor { get; set; } = Color.Error;
+    
+    [CascadingParameter]
+    private NotificationConnection _notifications { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        SetConnectionState(_notifications.ConnectionState, _notifications.ConnectionId);
+
+        Courier.SubscribeWeak<NotificationWrapper<ConnectionStateChanged>>(wrapper =>
+        {
+            SetConnectionState(wrapper.Notification.State, wrapper.Notification.Message);
+            StateHasChanged();
+        });
+    }
+
+    private void SetConnectionState(ConnectionState state, string? message)
+    {
+        switch (state)
+        {
+            case ConnectionState.Connected:
+                TooltipText = $"Connected to Server with ConnectionId {message}";
+                Icon = Icons.Material.Filled.SignalWifiStatusbar4Bar;
+                IconColor = Color.Success;
+                break;
+
+            case ConnectionState.Connecting:
+                TooltipText = $"(Re)connecting... ({message}).";
+                Icon = Icons.Material.Filled.SignalWifiStatusbarConnectedNoInternet4;
+                IconColor = Color.Warning;
+                break;
+
+            case ConnectionState.Disconnected:
+                TooltipText = $"Connection Closed ({message}).";
+                Icon = Icons.Material.Filled.SignalWifiOff;
+                IconColor = Color.Error;
+                break;
+        }
+    }
+}

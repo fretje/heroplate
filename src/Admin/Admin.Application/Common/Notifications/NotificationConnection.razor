@@ -1,0 +1,9 @@
+﻿@inject IAccessTokenProvider TokenProvider
+@inject IDispatcher Dispatcher
+@inject INotificationPublisher Publisher
+@inject IAuthenticationService Authenticator
+@inject ILogger<NotificationConnection> Logger
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>

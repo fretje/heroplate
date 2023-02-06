@@ -1,0 +1,39 @@
+﻿<div class="d-flex gap-3 align-center">
+    <MudDatePicker Label="@DateLabel" DateFormat="dd/MM/yyyy" Date="Date" DateChanged="SetDateAsync" Clearable="Clearable" />
+    <MudTimePicker Label="@TimeLabel" Time="Time" TimeChanged="SetTimeAsync" Disabled="DateTime == null" />
+</div>
+
+@code {
+    [Parameter]
+    public DateTime? DateTime { get; set; }
+    [Parameter]
+    public EventCallback<DateTime?> DateTimeChanged { get; set; }
+    [Parameter] 
+    public string DateLabel { get; set; } = default!;
+    [Parameter] 
+    public string TimeLabel { get; set; } = default!;
+    [Parameter]
+    public bool Clearable { get; set; }
+
+    private DateTime? Date => DateTime?.Date == default ? null : DateTime?.Date;
+
+    private Task SetDateAsync(DateTime? date)
+    {
+        TimeSpan sTime = Time.HasValue ? Time.Value : new TimeSpan();
+        DateTime = date.HasValue
+            ? new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, sTime.Hours, sTime.Minutes, sTime.Seconds)
+            : null;
+        return DateTimeChanged.InvokeAsync(DateTime);
+    }
+
+    private TimeSpan? Time => DateTime?.TimeOfDay == default ? null : DateTime?.TimeOfDay;
+
+    private Task SetTimeAsync(TimeSpan? time)
+    {
+        DateTime sDate = DateTime.HasValue ? DateTime.Value : new DateTime();
+        DateTime = time.HasValue
+            ? new DateTime(sDate.Year, sDate.Month, sDate.Day, time.Value.Hours, time.Value.Minutes, time.Value.Seconds)
+            : null;
+        return DateTimeChanged.InvokeAsync(DateTime);
+    }
+}

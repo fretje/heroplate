@@ -1,0 +1,181 @@
+﻿@typeparam TEntity
+@typeparam TId
+@typeparam TRequest
+
+@inject IJSRuntime JS
+@inject IStringLocalizer<SharedResource> L
+
+@if (_canSearch && (Context.AdvancedSearchEnabled || AdvancedSearchContent is not null))
+{
+    <MudExpansionPanel @bind-IsExpanded="_advancedSearchExpanded"
+        Style="padding:10px!important; margin-bottom:10px!important;border-radius: var(--mud-default-borderradius) !important;"
+        Class="mud-elevation-25" Text="@L["Advanced Search"]">
+        <MudTextField @bind-Value="SearchString" @bind-Value:after="OnSearchStringChangedAsync" Immediate
+            Placeholder="@($"{L["Search for"]} {Context.EntityTypeNamePlural}")" Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+            Style="flex:none!important;margin:0px!important">
+        </MudTextField>
+        @if (Context.AdvancedSearchEnabled)
+        {
+            <div style="margin-top:10px!important">
+                <MudCheckBox Label="All Columns" T="bool" Checked="Context.AllColumnsChecked"
+                    CheckedChanged="Context.AllColumnsCheckChanged"></MudCheckBox>
+                @foreach (var field in Context.Fields)
+                {
+                    <MudCheckBox @bind-Checked="@field.CheckedForSearch" Label="@(field.DisplayName)"></MudCheckBox>
+                }
+            </div>
+        }
+        @AdvancedSearchContent
+
+    </MudExpansionPanel>
+}
+
+<HeroTable @ref="_table" Elevation="Elevation" ServerData="ServerReloadFunc" Items="_entityList" Filter="LocalSearch"
+    Loading="Loading" LoadingProgressColor="Color.Info" RowStyleFunc="RowStyleFunc" SeleS>
+
+    <ToolBarContent>
+        <div class="justify-center mud-text-align-center">
+            @if (_canCreate)
+            {
+                <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary"
+                    OnClick="() => InvokeModalAsync()" StartIcon="@Icons.Material.Filled.Add"
+                    IconColor="Color.Surface">@L["Create"]</MudButton>
+            }
+            @if (ExtraToolBarContent is not null)
+            {
+                @ExtraToolBarContent
+            }
+        </div>
+        <MudSpacer />
+        @if (_canSearch && !_advancedSearchExpanded)
+        {
+            <MudTextField @bind-Value="SearchString" @bind-Value:after="OnSearchStringChangedAsync" Immediate
+                Placeholder="@($"{L["Search"]} {Context.EntityTypeNamePlural}")" Adornment="Adornment.End"
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3">
+            </MudTextField>
+        }
+    </ToolBarContent>
+
+    <HeaderContent>
+        @if (ActionsContent is not null || HasActions)
+        {
+            <MudTh Style="text-align: center">@ActionsHeader</MudTh>
+        }
+        @if (Context.Fields is not null)
+        {
+            foreach (var field in Context.Fields)
+            {
+                <MudTh>
+                    @if (Context.IsClientContext)
+                    {
+                        <MudTableSortLabel SortBy="field.ValueFunc">@field.DisplayName</MudTableSortLabel>
+                    }
+                    else
+                    {
+                        <MudTableSortLabel T="TEntity" SortLabel="@field.SortLabel">@field.DisplayName</MudTableSortLabel>
+                    }
+                </MudTh>
+            }
+        }
+    </HeaderContent>
+
+    <RowTemplate>
+        @if (ActionsContent is not null || HasActions)
+        {
+            <MudTd Class="no-width no-wrap px-0" DataLabel="Actions">
+                @if (ActionsContent is not null)
+                {
+                    @ActionsContent(context)
+                }
+                else if (HasActions)
+                {
+                    <MudButtonGroup Size="Size.Small" >
+                        @if (DetailsContent is not null)
+                        {
+                            <MudToggleIconButton
+                                Icon="@Icons.Material.Filled.KeyboardArrowRight" Size="Size.Small"
+                                ToggledIcon="@Icons.Material.Filled.KeyboardArrowDown" ToggledSize="Size.Small"
+                                Toggled="ShowDetailsFor(context)"
+                                ToggledChanged="(show) => SetShowDetailsFor(context, show)" />                           
+                        }
+                        @if (CanUpdateEntity(context))
+                        {
+                            <HeroTooltipButton Tooltip="@L["Edit"]" Icon="@Icons.Material.Filled.Edit"
+                                OnClick="() => InvokeModalAsync(context)" />
+                        }
+                        @if (OnDetails.HasDelegate)
+                        {
+                            <HeroTooltipButton Tooltip="@L["Details"]" Icon="@Icons.Material.Filled.MoreHoriz"
+                                OnClick="() => OnDetails.InvokeAsync(context)" />
+                        }
+                        @if (_canCreate && Context.GetDuplicateFunc is not null)
+                        {
+                            <HeroTooltipButton Tooltip="@L["Duplicate"]" Icon="@Icons.Material.Filled.ContentCopy"
+                                OnClick="() => InvokeModalAsync(entityToDuplicate: context)" />
+                        }
+                        @if (CanDeleteEntity(context))
+                        {
+                            <HeroTooltipButton Tooltip="@L["Delete"]" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                OnClick="() => DeleteAsync(context)" />
+                        }
+                        @if (ExtraActions is not null)
+                        {
+                            @ExtraActions(context)
+                        }
+                    </MudButtonGroup>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" DisableElevation
+                        StartIcon="@Icons.Material.Filled.DoNotTouch" IconColor="Color.Secondary" Size="Size.Small"
+                    Color="Color.Surface">
+                        @L["No Allowed Actions"]
+                    </MudButton>
+                }
+            </MudTd>
+        }
+        @foreach (var field in Context.Fields)
+        {
+            <MudTd DataLabel="@field.DisplayName">
+                @if (field.Template is not null)
+                {
+                    @field.Template(context)
+                }
+                else if (field.Type == typeof(bool))
+                {
+                    <MudCheckBox Dense Checked="field.ValueFunc(context)" ReadOnly Color="Color.Info"></MudCheckBox>
+                }
+                else
+                {
+                    <MudHighlighter Text="@field.ValueFunc(context)?.ToString()" HighlightedText="@SearchString" />
+                }
+            </MudTd>
+        }
+    </RowTemplate>
+
+    <ChildRowContent>
+        @if (ChildRowContent is not null)
+        {
+            @ChildRowContent(context)
+        }
+        else if (DetailsContent is not null)
+        {
+            @if (ShowDetailsFor(context))
+            {
+                <MudTr>
+                    <td colspan="@GetColumnCount() + 1">
+                        <div class="ps-7">
+                            @DetailsContent(context)
+                        </div>
+                    </td>
+                </MudTr>
+            }
+        }
+    </ChildRowContent>
+
+    <PagerContent>
+        <TablePager OnClickReload="RefreshDataAsync" />
+    </PagerContent>
+
+</HeroTable>

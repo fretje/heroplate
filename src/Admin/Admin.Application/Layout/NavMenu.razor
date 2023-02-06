@@ -1,0 +1,81 @@
+﻿@inject IStringLocalizer<NavMenu> L
+    
+<MudNavMenu>
+
+    <MudButton Variant="Variant.Text" DisableElevation Href="/" Class="ml-4">
+    <div style="width:100%;">
+        <img src="img/logo.png" style="height:45px;" class="ml-n4"  />
+    </div>
+    </MudButton>
+    
+    <PermissionsAuthorizeView Permission="@Permissions.Dashboard.View">
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Start"]</MudText>
+
+        <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">@L["Dashboard"]</MudNavLink>
+    </PermissionsAuthorizeView>
+    
+    <PermissionsAuthorizeView Permissions="new[] { Permissions.Brands.View, Permissions.Products.View }" Context="catalog">
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Catalog"]</MudText>
+
+        <PermissionsAuthorizeView Permission="@Permissions.Brands.View">
+            <MudNavLink Href="/brands" Icon="@Icons.Material.Filled.Groups" Class="hero-nav-child">
+                @L["Brands"]
+            </MudNavLink>
+        </PermissionsAuthorizeView>
+        <PermissionsAuthorizeView Permission="@Permissions.Products.View">
+            <MudNavLink Href="/products" Icon="@Icons.Material.Filled.Group" Class="hero-nav-child">
+                @L["Products"]
+            </MudNavLink>
+        </PermissionsAuthorizeView>
+    </PermissionsAuthorizeView>
+    
+    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Personal"]</MudText>
+
+    <MudNavLink Href="/audit-logs" Icon="@Icons.Material.Filled.SecurityUpdateGood">@L["Logs"]</MudNavLink>
+    
+    <PermissionsAuthorizeView Permissions="new[] { Permissions.AppSettings.View, Permissions.Hangfire.View, Permissions.Users.View, Permissions.Roles.View/*, Permissions.Tenants.View*/ }" Context="administration">
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Administration"]</MudText>
+        
+        <PermissionsAuthorizeView Permission="@Permissions.AppSettings.View">
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/appsettings" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+        </PermissionsAuthorizeView>
+        @if (_canViewHangfire)
+        {
+            <PermissionsAuthorizeView Permission="@Permissions.Hangfire.View">
+                <MudNavLink Href="@_hangfireUrl" Match="NavLinkMatch.All" Target="_blank" Icon="@Icons.Material.Filled.Work">@L["Hangfire"]</MudNavLink>
+            </PermissionsAuthorizeView>
+        }
+        <PermissionsAuthorizeView Permission="@Permissions.Users.View">
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.PeopleAlt">@L["Users"]</MudNavLink>
+        </PermissionsAuthorizeView>
+        <PermissionsAuthorizeView Permission="@Permissions.Roles.View">
+            <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">@L["Roles"]</MudNavLink>
+        </PermissionsAuthorizeView>
+        @* Disable Tenants view for now
+        <PermissionsAuthorizeView Permission="@Permissions.Tenants.View">
+            <MudNavLink Href="/tenants" Icon="@Icons.Material.Filled.GroupWork">@L["Tenants"]</MudNavLink>
+        </PermissionsAuthorizeView> *@
+    </PermissionsAuthorizeView>
+
+    <PermissionsAuthorizeView Permission="@Permissions.About.View">
+        <MudNavLink Href="/about" Icon="@Icons.Material.Outlined.Info">@L["About"]</MudNavLink>
+    </PermissionsAuthorizeView>
+
+</MudNavMenu>
+
+@code {
+    private string? _hangfireUrl;
+    private bool _canViewHangfire;
+
+    protected override void OnInitialized()
+    {
+        // Hangfire is only available when browsing from inside the data center or in development
+        // in other words, when the apibaseUrl is different from the frontent base url.
+        string apiBaseUrl = Config[ConfigNames.ApiBaseUrl]!;
+        _canViewHangfire = new Uri(apiBaseUrl) != new Uri(Navigation.BaseUri);
+        if (_canViewHangfire)
+        {
+            _hangfireUrl = apiBaseUrl + "jobs";
+        }
+    }
+}

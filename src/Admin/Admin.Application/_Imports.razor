@@ -1,0 +1,41 @@
+﻿@using System.Collections.ObjectModel
+@using System.Linq.Expressions
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using Blazored.LocalStorage
+@using Fluxor.Blazor.Web.Components
+@using Mapster
+@using MediatR.Courier
+@using MudBlazor
+@using Heroplate.Admin.Application.Authentication
+@using Heroplate.Admin.Application.Common
+@using Heroplate.Admin.Application.Common.EntityTable
+@using Heroplate.Admin.Application.Common.Notifications
+@using Heroplate.Admin.Application.Layout
+@using Heroplate.Admin.Application.Multitenancy
+@using Heroplate.Admin.Infrastructure.ApiClient
+@using Heroplate.Admin.Infrastructure.Auth
+@using Heroplate.Admin.Infrastructure.Common
+@using Heroplate.Admin.Infrastructure.Notifications
+@using Heroplate.Shared.Authorization
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IAuthorizationService Authorizer

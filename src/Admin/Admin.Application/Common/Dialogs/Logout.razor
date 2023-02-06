@@ -1,0 +1,30 @@
+﻿@inject IStringLocalizer<Logout> L
+@inject IAuthenticationService Authenticator
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Logout" Class="mr-3 mb-n1" />
+            @L["Logout Confirmation"]
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@L["Are you sure you want to log out?"]</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Cancel" OnClick="MudDialog.Cancel">@L["Cancel"]</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Logout" Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">@L["Logout"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    private async Task Submit()
+    {
+        Snackbar.Add(@L["Logged out"], Severity.Info);
+        await Authenticator.LogoutAsync();
+        MudDialog.Close();
+    }
+}

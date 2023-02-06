@@ -1,0 +1,5 @@
+﻿@inject IAuthenticationService AuthService
+
+@code {
+    protected override void OnInitialized() => AuthService.NavigateToLogin();
+}

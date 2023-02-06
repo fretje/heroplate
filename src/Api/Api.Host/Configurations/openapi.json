@@ -1,0 +1,11 @@
+{
+  "SwaggerSettings": {
+    "Enable": true,
+    "Title": "Heroplate Api",
+    "Version": "v1",
+    "Description": "Heroplate Api and SignalR back-end.",
+    "ContactName": "Heroplate",
+    "ContactEmail": "admin@heroplate",
+    "ContactUrl": "https://heroplate/"
+  }
+}

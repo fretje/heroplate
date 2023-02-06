@@ -1,0 +1,10 @@
+﻿@inherits FluxorComponent
+
+@inject IState<LayoutState> LayoutState
+@inject IDispatcher Dispatcher
+
+<MudToggleIconButton Class="d-flex ml-auto"
+    Toggled="@LayoutState.Value.IsDarkMode"
+    ToggledChanged="isDarkMode => Dispatcher.Dispatch(new ChangeDarkModeAction(isDarkMode))"
+    Icon="@Icons.Material.Filled.DarkMode" Color="@Color.Warning" Title="Switch to dark mode"
+    ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Surface" ToggledTitle="Switch to light mode" />

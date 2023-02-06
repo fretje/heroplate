@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>Heroplate.Api.Infrastructure.Migrator</RootNamespace>
+        <AssemblyName>Heroplate.Api.Infrastructure.Migrator</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Api.Infrastructure\Api.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

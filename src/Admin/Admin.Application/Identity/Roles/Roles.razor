@@ -1,0 +1,35 @@
+﻿@page "/roles"
+
+@attribute [PermissionsAuthorize(Permissions.Roles.View)]
+
+@inject IStringLocalizer<Roles> L
+@inject IRolesClient RolesClient
+
+<HeroTitle Title="@L["Roles"]" Description="@L["Manage Roles."]" />
+
+<EntityTable TEntity="RoleDto" TId="string" TRequest="CreateOrUpdateRoleRequest" Context="@Context">
+
+    <ExtraActions>
+        @if (_canViewRoleClaims)
+        {
+            <HeroTooltipButton Tooltip="@L["Manage Permission"]" Icon="@Icons.Material.Filled.MoreHoriz" OnClick="() => ManagePermissions(context.Id)" />
+        }
+    </ExtraActions>
+
+    <EntityFields>
+        @if (!Context.AddEditModal.IsCreate)
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField Value="context.Id" ReadOnly DisableUnderLine Label="@L[$"Role Id"]" />
+            </MudItem>
+        }
+        <MudItem xs="12" md="6">
+            <MudTextField For="() => context.Name" @bind-Value="context.Name" Label="@L["Role Name"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField For="() => context.Description" @bind-Value="context.Description"
+                Label="@L["Description"]" />
+        </MudItem>
+    </EntityFields>
+
+</EntityTable>

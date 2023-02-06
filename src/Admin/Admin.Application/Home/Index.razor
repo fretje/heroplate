@@ -1,0 +1,28 @@
+﻿@page "/home"
+@page "/"
+
+@inject IStringLocalizer<Index> L
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-center mt-4">
+                <img src="./img/logo-large.png" Style="height:250px" />
+            </div>
+        </MudItem>
+
+        <MudItem xs="12">
+           <div class="mud-typography-align-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Dashboard"
+                    Href="/dashboard">
+                    @L["Dashboard"]
+                </MudButton>
+
+                <MudButton Variant="Variant.Outlined" Style="margin-left:5px" Color="Color.Default" StartIcon="@Icons.Custom.Brands.GitHub"
+                    Href="https://github.com/fretje/heroplate" Target="_blank">
+                    @L["Star on GitHub"]
+                </MudButton>
+           </div>
+        </MudItem>
+    </MudGrid> 
+</MudContainer>

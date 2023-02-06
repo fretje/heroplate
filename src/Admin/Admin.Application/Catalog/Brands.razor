@@ -1,0 +1,55 @@
+﻿@page "/brands"
+
+@attribute [PermissionsAuthorize(Permissions.Brands.View)]
+
+@inject IStringLocalizer<Brands> L
+@inject IBrandsClient BrandsClient
+
+<HeroTitle Title="@L["Brands"]" Description="@L["Manage Brands."]" />
+
+<EntityTable TEntity="BrandDto" TId="int" TRequest="UpdateBrandRequest" Context="@Context">
+
+    <EntityFields>
+        <MudItem xs="12" md="12">
+            <MudTextField T="string" For="() => context.Name"
+                @bind-Value="context.Name" Label="@L["Name"]" />
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudTextField For="() => context.Description" Lines="3"
+                @bind-Value="context.Description" Label="@L["Description"]" />
+        </MudItem>
+    </EntityFields>
+
+    <DetailsContent>
+        <Products BrandId="context.Id" />
+    </DetailsContent>
+
+</EntityTable>
+
+@code {
+    protected EntityServerTableContext<BrandDto, int, UpdateBrandRequest> Context { get; set; } = default!;
+
+    protected override void OnInitialized() =>
+        Context = new(
+            entityTypeName: L["Brand"],
+            entityTypeNamePlural: L["Brands"],
+            createPermission: Permissions.Brands.Create,
+            updatePermission: Permissions.Brands.Update,
+            deletePermission: Permissions.Brands.Delete,
+            fields: new()
+                {
+                    new(brand => brand.Name, L["Name"], "Name"),
+                    new(brand => brand.Description, L["Description"], "Description"),
+                },
+            idFunc: brand => brand.Id,
+            searchFunc: async filter =>
+                {
+                    var searchFilter = filter.Adapt<SearchBrandsRequest>();
+                    searchFilter.AdvancedSearch = new Search { Fields = new[] { "Id", "Name", "Description" }, Keyword = filter.Keyword };
+                    searchFilter.Keyword = null;
+                    return (await BrandsClient.SearchAsync(searchFilter)).Adapt<PaginationResponse<BrandDto>>();
+                },
+            createFunc: async brand => await BrandsClient.CreateAsync(brand.Adapt<CreateBrandRequest>()),
+            updateFunc: BrandsClient.UpdateAsync,
+            deleteFunc: BrandsClient.DeleteAsync);
+}

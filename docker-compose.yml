@@ -1,0 +1,69 @@
+version: '3.4'
+
+services:
+  reverse-proxy:
+    image: traefik:v2.6
+    container_name: reverse-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/config.yml:/etc/traefik/config.yml:ro
+      - ./certs:/etc/certs:ro
+      
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    container_name: db
+    restart: always
+    environment:
+      MSSQL_SA_PASSWORD: "$uper$ecretPassword123!"
+      SA_PASSWORD: "$uper$ecretPassword123!"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ~/herodata:/var/opt/mssql/data
+    ports:
+      - "1444:1433"
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+  api:
+    image: hero-api
+    container_name: api
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.tls=true
+      - traefik.http.routers.api.rule=Host(`heroplate.local`) && (PathPrefix(`/api`) || PathPrefix(`/notifications`) || PathPrefix(`/Files`))
+      - traefik.http.services.api.loadbalancer.server.port=80
+    build:
+      dockerfile: src/Api/Api.Host/Dockerfile
+    environment:
+      - "DatabaseSettings__ConnectionString=Server=db;Database=herodb;User=sa;Password=$uper$ecretPassword123!;Persist Security Info=True;Connection Timeout=60;Trust Server Certificate=true;MultipleActiveResultSets=true"
+      - "HangfireSettings__Storage__ConnectionString=Server=db;Database=herodb;User=sa;Password=$uper$ecretPassword123!;Connection Timeout=60;MultipleActiveResultSets=true"
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    
+  admin:
+    image: hero-admin
+    container_name: admin
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.admin.tls=true
+      - traefik.http.routers.admin.rule=Host(`heroplate.local`)
+      - traefik.http.services.admin.loadbalancer.server.port=80
+    build:
+      dockerfile: src/Admin/Admin.Host/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      - api
+    restart: on-failure

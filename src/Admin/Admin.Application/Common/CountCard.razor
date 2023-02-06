@@ -1,0 +1,21 @@
+﻿<MudPaper Elevation="5" Class="px-4 py-1" Width="186px">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">@Text</MudText>
+        <MudStack Row Spacing="2">
+            <MudIcon Icon="@Icon" Color="@Color" Size="Size.Large"></MudIcon>
+            <MudText Typo="Typo.h5">@($"{Count:N0}")</MudText>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+
+@code {
+    [Parameter]
+    public string Icon { get; set; } = default!;
+    [Parameter]
+    public Color Color { get; set; } = Color.Primary;
+    [Parameter]
+    public string Text { get; set; } = default!;
+    [Parameter]
+    public int Count { get; set; }
+}
