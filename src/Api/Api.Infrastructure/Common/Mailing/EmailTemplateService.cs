@@ -16,7 +16,7 @@ public class EmailTemplateService : IEmailTemplateService
         return compiledTemplate.Run(mailTemplateModel);
     }
 
-    public string GetTemplate(string templateName)
+    private static string GetTemplate(string templateName)
     {
         string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         string tmplFolder = Path.Combine(baseDirectory, "Email Templates");

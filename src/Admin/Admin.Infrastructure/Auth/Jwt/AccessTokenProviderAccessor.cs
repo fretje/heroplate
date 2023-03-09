@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Heroplate.Admin.Infrastructure.Auth.Jwt;
 
-internal class AccessTokenProviderAccessor : IAccessTokenProviderAccessor
+internal sealed class AccessTokenProviderAccessor : IAccessTokenProviderAccessor
 {
     private readonly IServiceProvider _provider;
     private IAccessTokenProvider? _tokenProvider;

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace Heroplate.Admin.Infrastructure.Auth.Jwt;
 
-public class JwtAuthenticationService : AuthenticationStateProvider, IAuthenticationService, IAccessTokenProvider
+public sealed class JwtAuthenticationService : AuthenticationStateProvider, IAuthenticationService, IAccessTokenProvider, IDisposable
 {
     private const string AuthTokenKey = "AuthToken";
     private const string RefreshTokenKey = "RefreshToken";
@@ -198,7 +198,7 @@ public class JwtAuthenticationService : AuthenticationStateProvider, IAuthentica
                 string? rolesString = roles.ToString();
                 if (!string.IsNullOrEmpty(rolesString))
                 {
-                    if (rolesString.Trim().StartsWith("["))
+                    if (rolesString.Trim().StartsWith("[", StringComparison.Ordinal))
                     {
                         string[]? parsedRoles = JsonSerializer.Deserialize<string[]>(rolesString);
 
@@ -228,4 +228,6 @@ public class JwtAuthenticationService : AuthenticationStateProvider, IAuthentica
         string base64 = payload.PadRight(payload.Length + ((4 - (payload.Length % 4)) % 4), '=');
         return Convert.FromBase64String(base64);
     }
+
+    public void Dispose() => _semaphore?.Dispose();
 }

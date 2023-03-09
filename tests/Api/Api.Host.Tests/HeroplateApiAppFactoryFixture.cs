@@ -1,4 +1,5 @@
-﻿using Heroplate.Api.Host.Controllers;
+﻿using System.Diagnostics.CodeAnalysis;
+using Heroplate.Api.Host.Controllers;
 using Heroplate.Api.Infrastructure.BackgroundJobs;
 using Heroplate.Api.Infrastructure.Persistence;
 using Heroplate.Shared.Authorization;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Host.Tests;
 
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Disposal is handled by Dependency Injection")]
 public sealed class HeroApiAppFactoryFixture : HeroplateApiDbFixture
 {
     private readonly HeroApiAppFactory _appFactory;

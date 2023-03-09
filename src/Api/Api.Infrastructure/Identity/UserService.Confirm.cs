@@ -29,15 +29,14 @@ internal partial class UserService
 
         var user = await _userManager.Users
             .Where(u => u.Id == userId && !u.EmailConfirmed)
-            .FirstOrDefaultAsync(ct);
-
-        _ = user ?? throw new InternalServerException(_t["An error occurred while confirming E-Mail."]);
+            .FirstOrDefaultAsync(ct)
+            ?? throw new InternalServerException(_t["An error occurred while confirming E-Mail."]);
 
         code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
         var result = await _userManager.ConfirmEmailAsync(user, code);
 
         return result.Succeeded
-            ? string.Format(_t["Account Confirmed for E-Mail {0}. You can now use the /api/tokens endpoint to generate JWT."], user.Email)
-            : throw new InternalServerException(string.Format(_t["An error occurred while confirming {0}"], user.Email));
+            ? _t["Account Confirmed for E-Mail {0}. You can now use the /api/tokens endpoint to generate JWT.", user.Email!]
+            : throw new InternalServerException(_t["An error occurred while confirming {0}", user.Email!]);
     }
 }

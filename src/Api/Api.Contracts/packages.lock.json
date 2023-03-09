@@ -4,15 +4,15 @@
     "net7.0": {
       "Microsoft.CodeAnalysis.NetAnalyzers": {
         "type": "Direct",
-        "requested": "[7.0.0, )",
-        "resolved": "7.0.0",
-        "contentHash": "Khlc9eqD9Dqn9C483beBm9NvVLF1atZng9AWc6ujeXyw2xdhDaaTKQ3Nq57r2tGMVle/pIvoNs5lCgTkQ0eB4g=="
+        "requested": "[8.0.0-preview1.23080.2, )",
+        "resolved": "8.0.0-preview1.23080.2",
+        "contentHash": "C4Yyk0iOKglcdfhVnamm/2CRj8walpeNpzvlD8dck5zoiZaEma13gHlvaYUVYM3/2PhqoXNCJ0cPZGvwM516Wg=="
       },
       "Microsoft.VisualStudio.Threading.Analyzers": {
         "type": "Direct",
-        "requested": "[17.4.33, )",
-        "resolved": "17.4.33",
-        "contentHash": "gpf500WFCqnhJmbIEDvVYgeNLpHZ6PAyhcewyqqpE8UoKNHoCDdMgogulYuJERbRaGqywqD1pRwPNplVteNZ8g=="
+        "requested": "[17.5.22, )",
+        "resolved": "17.5.22",
+        "contentHash": "WzCsniKpC6S9yAerB+Od8pK8RytxW+fFSZ+GjL0y0XdIb7H/os71bWFbKMXxB1omDLZHNm1IdBlcLQm4KmS/AQ=="
       },
       "Roslynator.Analyzers": {
         "type": "Direct",

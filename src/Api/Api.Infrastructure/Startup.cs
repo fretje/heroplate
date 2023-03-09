@@ -20,7 +20,6 @@ using Heroplate.Api.Infrastructure.Multitenancy;
 using Heroplate.Api.Infrastructure.Notifications;
 using Heroplate.Api.Infrastructure.Persistence;
 using Heroplate.Api.Infrastructure.Persistence.Initialization;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -51,7 +50,7 @@ public static class Startup
             .AddHealthCheck()
             .AddPOLocalization(config)
             .AddMailing(config)
-            .AddMediatR(assemblies)
+            .AddMediatR(options => options.RegisterServicesFromAssemblies(assemblies))
             .AddFluentValidation(assemblies)
             .AddMultitenancy()
             .AddNotifications(config)

@@ -11,11 +11,11 @@ public class UpdateUserRequest : IRequest
     public bool DeleteCurrentImage { get; set; }
 }
 
-public class UpdateUserRequestHandler : AsyncRequestHandler<UpdateUserRequest>
+public class UpdateUserRequestHandler : IRequestHandler<UpdateUserRequest>
 {
     private readonly IUserService _userService;
     public UpdateUserRequestHandler(IUserService userService) => _userService = userService;
 
-    protected override Task Handle(UpdateUserRequest req, CancellationToken ct) =>
+    public Task Handle(UpdateUserRequest req, CancellationToken ct) =>
         _userService.UpdateAsync(req, ct);
 }

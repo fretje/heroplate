@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Net;
 using Heroplate.Api.Contracts.Multitenancy;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace Tests.Shared;
 
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Disposal is handled by IAsyncLifetime")]
 public abstract class HeroplateApiDbFixture : IAsyncLifetime
 {
     private DbConnection? _dbConnection;

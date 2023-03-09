@@ -1,3 +1,4 @@
+using System.Globalization;
 using Heroplate.Shared.Authorization;
 
 namespace System.Security.Claims;
@@ -33,7 +34,8 @@ public static class ClaimsPrincipalExtensions
 
     public static DateTimeOffset GetExpiration(this ClaimsPrincipal principal) =>
         DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(
-            principal.FindFirstValue(CustomClaimTypes.Expiration)));
+            principal.FindFirstValue(CustomClaimTypes.Expiration),
+            CultureInfo.InvariantCulture));
 
     private static string? FindFirstValue(this ClaimsPrincipal principal, string claimType) =>
         principal is null

@@ -4,11 +4,11 @@ public class GetAppSettingsRequest : IRequest<List<AppSettingDto>>
 {
 }
 
-public class GetAppSettingsRequestHandler : RequestHandler<GetAppSettingsRequest, List<AppSettingDto>>
+public class GetAppSettingsRequestHandler : IRequestHandler<GetAppSettingsRequest, List<AppSettingDto>>
 {
     private readonly IAppSettingRepository _appSettings;
     public GetAppSettingsRequestHandler(IAppSettingRepository appSettings) => _appSettings = appSettings;
 
-    protected override List<AppSettingDto> Handle(GetAppSettingsRequest request) =>
-        _appSettings.GetAll();
+    public Task<List<AppSettingDto>> Handle(GetAppSettingsRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult(_appSettings.GetAll());
 }

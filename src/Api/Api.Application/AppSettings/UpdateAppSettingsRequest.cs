@@ -12,12 +12,12 @@ public class UpdateAppSettingsRequestValidator : AbstractValidator<UpdateAppSett
             .NotEmpty();
 }
 
-public class UpdateAppSettingsRequestHandler : AsyncRequestHandler<UpdateAppSettingsRequest>
+public class UpdateAppSettingsRequestHandler : IRequestHandler<UpdateAppSettingsRequest>
 {
     private readonly IAppSettingRepository _appSettings;
     public UpdateAppSettingsRequestHandler(IAppSettingRepository appSettings) => _appSettings = appSettings;
 
-    protected override async Task Handle(UpdateAppSettingsRequest req, CancellationToken ct)
+    public async Task Handle(UpdateAppSettingsRequest req, CancellationToken ct)
     {
         foreach (var setting in req.AppSettings)
         {

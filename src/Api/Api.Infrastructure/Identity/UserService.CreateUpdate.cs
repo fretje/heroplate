@@ -29,7 +29,7 @@ internal partial class UserService
 
         await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
 
-        var messages = new List<string> { string.Format(_t["User {0} Registered."], user.UserName) };
+        var messages = new List<string> { _t["User {0} Registered.", user.UserName] };
 
         if (_securitySettings.RequireConfirmedAccount && !string.IsNullOrEmpty(user.Email))
         {

@@ -1,7 +1,6 @@
 ﻿using Heroplate.Api.Contracts.Notifications;
 using MediatR;
 using MediatR.Courier;
-using MediatR.Courier.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Heroplate.Admin.Infrastructure.Notifications;
@@ -13,7 +12,7 @@ internal static class Startup
         // Add mediator processing of notifications
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         services
-            .AddMediatR(assemblies)
+            .AddMediatR(options => options.RegisterServicesFromAssemblies(assemblies))
             .AddCourier(assemblies)
             .AddTransient<INotificationPublisher, NotificationPublisher>();
 

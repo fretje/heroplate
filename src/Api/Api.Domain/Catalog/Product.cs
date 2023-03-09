@@ -17,12 +17,12 @@ public class Product : AuditableEntityWithName
 
     public void Update(string? name, string? description, decimal? rate, string? imagePath, int? brandId)
     {
-        if (name is not null && Name?.Equals(name) is not true)
+        if (name is not null && Name?.Equals(name, StringComparison.Ordinal) is not true)
         {
             Name = name;
         }
 
-        if (description is not null && Description?.Equals(description) is not true)
+        if (description is not null && Description?.Equals(description, StringComparison.Ordinal) is not true)
         {
             Description = description;
         }
@@ -37,7 +37,7 @@ public class Product : AuditableEntityWithName
             BrandId = brandId.Value;
         }
 
-        if (imagePath is not null && ImagePath?.Equals(imagePath) is not true)
+        if (imagePath is not null && ImagePath?.Equals(imagePath, StringComparison.Ordinal) is not true)
         {
             ImagePath = imagePath;
         }
