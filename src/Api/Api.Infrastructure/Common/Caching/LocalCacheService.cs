@@ -52,7 +52,7 @@ public class LocalCacheService : ICacheService
     }
 
     public bool Contains(string key) =>
-        _cache.TryGetValue(key, out object _);
+        _cache.TryGetValue(key, out object? _);
 
     public Task<bool> ContainsAsync(string key, CancellationToken ct = default) =>
         Task.FromResult(Contains(key));
