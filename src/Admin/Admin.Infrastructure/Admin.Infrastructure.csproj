@@ -7,16 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
-        <PackageReference Include="Fluxor.Persist" Version="2.4.0" />
+        <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+        <PackageReference Include="Fluxor.Persist" Version="2.5.3" />
         <PackageReference Include="MediatR.Courier" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.3" />
-        <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.10" />
+        <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.10" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.3" />
-        <PackageReference Include="MudBlazor" Version="6.1.9" />
-        <PackageReference Include="NSwag.MSBuild" Version="13.18.2">
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.10" />
+        <PackageReference Include="MudBlazor" Version="6.9.0" />
+        <PackageReference Include="NSwag.MSBuild" Version="13.20.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

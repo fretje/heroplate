@@ -21,10 +21,10 @@ public class HangfireService : IBackgroundJobService
     public void AddOrUpdate(string recurringJobId, IRequest request, string cronExpression, TimeSpan? timeout = null, TimeZoneInfo? timeZone = null, string queue = "default") =>
         RecurringJob.AddOrUpdate<HangfireMediatorBridge>(
             recurringJobId,
+            queue,
             bridge => bridge.SendAsync(GetDisplayName(request), _currentTenant.Id, _currentUser.GetUserId().ToString(), request, timeout, default),
             cronExpression,
-            timeZone,
-            queue);
+            new() { TimeZone = timeZone });
 
     public void RemoveIfExists(string recurringJobId) =>
         RecurringJob.RemoveIfExists(recurringJobId);

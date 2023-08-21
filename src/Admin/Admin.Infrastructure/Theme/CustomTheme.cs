@@ -6,7 +6,7 @@ public class CustomTheme : MudTheme
 {
     public CustomTheme()
     {
-        Palette = new Palette()
+        Palette = new()
         {
             Primary = "#F26963",
             Secondary = "#eaaf1a",
@@ -28,7 +28,7 @@ public class CustomTheme : MudTheme
             OverlayDark = "hsl(0deg 0% 0% / 75%)"
         };
 
-        PaletteDark = new Palette()
+        PaletteDark = new()
         {
             Primary = "#F26963",
             Black = "#27272f",
@@ -55,13 +55,13 @@ public class CustomTheme : MudTheme
             TextDisabled = "#ffffff38",
         };
 
-        LayoutProperties = new LayoutProperties()
+        LayoutProperties = new()
         {
             DefaultBorderRadius = "5px"
         };
 
         Typography = CustomTypography.HeroTypography;
-        Shadows = new Shadow();
-        ZIndex = new ZIndex() { Drawer = 1300 };
+        Shadows = new();
+        ZIndex = new() { Drawer = 1300 };
     }
 }

@@ -1,8 +1,5 @@
-﻿using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
-using MartinCostello.SqlLocalDb;
-using Microsoft.Data.SqlClient;
+﻿using MartinCostello.SqlLocalDb;
+using Testcontainers.MsSql;
 
 namespace Tests.Shared;
 
@@ -13,9 +10,10 @@ public sealed class SqlDbInstance : IAsyncDisposable
 {
     private readonly bool _forceContainer;
 
-    private readonly MsSqlTestcontainer? _containerDb;
+    private readonly MsSqlContainer? _containerDb;
     private readonly SqlLocalDbApi? _localDbApi;
     private TemporarySqlLocalDbInstance? _localDb;
+    private string? _connectionString;
 
     private bool _hasStarted;
 
@@ -31,13 +29,9 @@ public sealed class SqlDbInstance : IAsyncDisposable
 
         if (UseContainers)
         {
-            using var containerDbConfig = new MsSqlTestcontainerConfiguration("mcr.microsoft.com/mssql/server:2022-latest")
-            {
-                Database = DbName,
-                Password = "$uper$ecretPassword123!"
-            };
-            _containerDb = new TestcontainersBuilder<MsSqlTestcontainer>()
-                .WithDatabase(containerDbConfig)
+            _containerDb = new MsSqlBuilder()
+                .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+                .WithPassword("$uper$ecretPassword123")
                 .Build();
         }
         else
@@ -54,22 +48,25 @@ public sealed class SqlDbInstance : IAsyncDisposable
     public string ConnectionString =>
         !_hasStarted
             ? throw new InvalidOperationException("The Sql Db Instance hasn't started yet. Call StartAsync first.")
-            : UseContainers
-                ? _containerDb!.ConnectionString
-                : _localDb!.ConnectionString; // SqlDbHelper.GetConnectionString(_localDb!.ConnectionString, DbName);
+            : _connectionString!;
 
     public string ConnectionStringWithTrustServerCertificate =>
-        new SqlConnectionStringBuilder(ConnectionString) { TrustServerCertificate = true }.ConnectionString;
+        SqlDbHelper.AddTrustServerCertificate(ConnectionString);
 
     public async Task StartAsync()
     {
         if (UseContainers)
         {
             await _containerDb!.StartAsync();
+
+            // Create a new db with the actual DbName
+            _connectionString = SqlDbHelper.GetConnectionString(_containerDb.GetConnectionString(), DbName);
+            await SqlDbHelper.CreateAsync(_connectionString, default);
         }
         else
         {
             _localDb = _localDbApi!.CreateTemporaryInstance(deleteFiles: true);
+            _connectionString = SqlDbHelper.GetConnectionString(_localDb.ConnectionString, DbName);
         }
 
         _hasStarted = true;
@@ -79,10 +76,10 @@ public sealed class SqlDbInstance : IAsyncDisposable
     {
         if (_localDb is not null)
         {
-            // if (await SqlDbHelper.DbExistsAsync(ConnectionString, default))
-            // {
-            //    await SqlDbHelper.DropAsync(ConnectionString, default);
-            // }
+            if (await SqlDbHelper.DbExistsAsync(ConnectionString, default))
+            {
+                await SqlDbHelper.DropAsync(ConnectionString, default);
+            }
 
             _localDb.Dispose();
             _localDb = null;

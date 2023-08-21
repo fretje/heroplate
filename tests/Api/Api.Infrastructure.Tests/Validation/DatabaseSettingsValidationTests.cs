@@ -25,7 +25,7 @@ public class DatabaseSettingsValidationTests
 
         // Assert
         Assert.NotEmpty(validationResults);
-        Assert.Equal(1, validationResults.Count);
+        Assert.Single(validationResults);
         Assert.Contains(nameof(DatabaseSettings.ConnectionString), validationResults.SelectMany(r => r.MemberNames));
     }
 
@@ -48,7 +48,7 @@ public class DatabaseSettingsValidationTests
 
         // Assert
         Assert.NotEmpty(validationResults);
-        Assert.Equal(1, validationResults.Count);
+        Assert.Single(validationResults);
         Assert.Contains(nameof(DatabaseSettings.DBProvider), validationResults.SelectMany(r => r.MemberNames));
     }
 
